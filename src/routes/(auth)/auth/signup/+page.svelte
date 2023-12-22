@@ -2,10 +2,27 @@
 	// Forms
 	import { enhance } from '$app/forms';
 
+	// Components
+	import Alert from '$lib/components/form/Alert.svelte';
+	import EmailInput from '$lib/components/form/EmailInput.svelte';
+	import PasswordInput from '$lib/components/form/PasswordInput.svelte';
+	// Interfaces
+	import type { IRegisterErrors } from '$lib/db/schema/UserSchema';
+
 	export let form;
 
+	// Form Validation
+	let formErrors: IRegisterErrors | undefined;
+
 	$: if (form) {
-		console.log('cobando ~ file: +page.svelte:8 ~ form:', form);
+		if (form.success) {
+			// Clear loading
+			formErrors = undefined;
+		} else {
+			if ('errors' in form && form.errors) {
+				formErrors = form.errors as IRegisterErrors;
+			}
+		}
 	}
 </script>
 
@@ -27,16 +44,28 @@
 			};
 		}}
 	>
-		<label class="label-text" for="email">Email</label>
-		<input class="input input-bordered" name="email" type="email" />
+		{#if form && form.message.length > 0}
+			<Alert
+				message={form.message}
+				type={form.success ? 'success' : 'warning'}
+				onDestroyCallback={() => {
+					if (form) {
+						form.message = '';
+					}
+				}}
+			/>
+		{/if}
 
-		<label class="label-text" for="password">Password</label>
-		<input class="input input-bordered" name="password" type="password" />
+		<EmailInput required errorMessage={formErrors?.email} />
+		<PasswordInput required label="Password" name="password" errorMessage={formErrors?.password} />
+		<PasswordInput
+			required
+			label="Confirm Password"
+			name="confirm_password"
+			errorMessage={formErrors?.confirm_password}
+		/>
 
-		<label class="label-text" for="confirm_password">Confirm Password</label>
-		<input class="input input-bordered" type="password" name="confirm_password" />
-
-		<a href="/auth/create-profile" class="btn btn-primary">Submit</a>
+		<button class="btn btn-primary" type="submit">Submit</button>
 		<p>Already have an account? <a class="text-primary" href="/auth/signin">Sign in</a></p>
 	</form>
 </div>
