@@ -1,7 +1,6 @@
 <script lang="ts">
 	// Forms
 	import { enhance } from '$app/forms';
-
 	// Components
 	import Alert from '$lib/components/form/Alert.svelte';
 	import EmailInput from '$lib/components/form/EmailInput.svelte';
