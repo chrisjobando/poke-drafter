@@ -1,13 +1,22 @@
 <script lang="ts">
 	// Interface
-	interface IPasswordInputProps {
+	interface ITextInputProps {
 		label: string;
 		name: string;
+		placeholder: string;
 		required: boolean;
+		autocomplete?: string;
 		errorMessage?: string;
 	}
 
-	const { label, name, required = false, errorMessage } = $props<IPasswordInputProps>();
+	const {
+		label,
+		name,
+		placeholder,
+		required = false,
+		autocomplete,
+		errorMessage
+	} = $props<ITextInputProps>();
 </script>
 
 <label class="label-text font-bold" for={name}
@@ -17,7 +26,7 @@
 	{/if}
 </label>
 
-<input class="input input-bordered" placeholder="pikachulover123!" type="password" {name} />
+<input class="input input-bordered" type="text" {autocomplete} {name} {placeholder} />
 
 {#if errorMessage}
 	<p class="mt-1 pl-2 text-sm font-bold text-red-500">{errorMessage}</p>
