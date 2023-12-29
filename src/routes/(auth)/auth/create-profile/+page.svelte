@@ -1,8 +1,28 @@
 <script lang="ts">
-	// Forms
-	import { enhance } from '$app/forms';
 	// Components
-	import TextInput from '$lib/components/form/TextInput.svelte';
+	import { TextInput } from '$lib/components/forms/index.js';
+	import { Button, Heading } from 'flowbite-svelte';
+	// Interfaces
+	import type { ICreateTrainerErrors } from '$lib/db/schema/UserSchema.js';
+
+	// Form Data
+	const { form } = $props();
+
+	// Form Validation
+	let formErrors = $state<ICreateTrainerErrors>();
+
+	$effect(() => {
+		if (form) {
+			if (form.success) {
+				// Clear loading
+				formErrors = undefined;
+			} else {
+				if ('errors' in form && form.errors) {
+					formErrors = form.errors as ICreateTrainerErrors;
+				}
+			}
+		}
+	});
 </script>
 
 <svelte:head>
@@ -10,27 +30,19 @@
 	<meta name="description" content="Create your PokeDrafter profile" />
 </svelte:head>
 
-<div class="card">
-	<h1 class="card-title">Create Profile</h1>
+<form class="flex flex-col space-y-6" method="post">
+	<Heading class="text-gray-900 dark:text-white" tag="h3">Create Profile</Heading>
 
-	<form
-		class="card-body"
-		method="POST"
-		use:enhance={() => {
-			return async ({ update }) => {
-				// Prevent clearing form input on submit
-				await update({ reset: false });
-			};
-		}}
-	>
+	<div class="mb-6">
 		<TextInput
 			required
-			autocomplete="given-name"
-			label="Name"
+			id="name"
+			label="Trainer Name"
 			name="name"
 			placeholder="Ash Ketchum"
+			textError={formErrors?.name}
 		/>
+	</div>
 
-		<button class="btn btn-primary" type="submit">Let's Go!</button>
-	</form>
-</div>
+	<Button class="mb-6 w-full" type="submit">Submit</Button>
+</form>

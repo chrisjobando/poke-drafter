@@ -1,28 +1,28 @@
 <script lang="ts">
-	// Forms
-	import { enhance } from '$app/forms';
 	// Components
-	import Alert from '$lib/components/form/Alert.svelte';
-	import EmailInput from '$lib/components/form/EmailInput.svelte';
-	import PasswordInput from '$lib/components/form/PasswordInput.svelte';
+	import { EmailInput, PasswordInput } from '$lib/components/forms/index.js';
+	import { Button, Heading } from 'flowbite-svelte';
 	// Interfaces
-	import type { IRegisterErrors } from '$lib/db/schema/UserSchema';
+	import type { IRegisterErrors } from '$lib/db/schema/UserSchema.js';
 
-	export let form;
+	// Form Data
+	const { form } = $props();
 
 	// Form Validation
-	let formErrors: IRegisterErrors | undefined;
+	let formErrors = $state<IRegisterErrors>();
 
-	$: if (form) {
-		if (form.success) {
-			// Clear loading
-			formErrors = undefined;
-		} else {
-			if ('errors' in form && form.errors) {
-				formErrors = form.errors as IRegisterErrors;
+	$effect(() => {
+		if (form) {
+			if (form.success) {
+				// Clear loading
+				formErrors = undefined;
+			} else {
+				if ('errors' in form && form.errors) {
+					formErrors = form.errors as IRegisterErrors;
+				}
 			}
 		}
-	}
+	});
 </script>
 
 <svelte:head>
@@ -30,41 +30,39 @@
 	<meta name="description" content="Sign up for PokeDrafter" />
 </svelte:head>
 
-<div class="card">
-	<h1 class="card-title">Sign Up</h1>
+<form class="flex flex-col space-y-6" method="post">
+	<Heading class="text-gray-900 dark:text-white" tag="h3">Sign up</Heading>
 
-	<form
-		class="card-body"
-		method="POST"
-		use:enhance={() => {
-			return async ({ update }) => {
-				// Prevent clearing form inputs on submit
-				await update({ reset: false });
-			};
-		}}
-	>
-		{#if form && form.message.length > 0}
-			<Alert
-				message={form.message}
-				type={form.success ? 'success' : 'warning'}
-				onDestroyCallback={() => {
-					if (form) {
-						form.message = '';
-					}
-				}}
-			/>
-		{/if}
+	<div class="mb-6">
+		<EmailInput emailError={formErrors?.email} />
+	</div>
 
-		<EmailInput required errorMessage={formErrors?.email} />
-		<PasswordInput required label="Password" name="password" errorMessage={formErrors?.password} />
+	<div class="mb-6">
 		<PasswordInput
-			required
+			id="password"
+			label="Password"
+			name="password"
+			passwordError={formErrors?.password}
+		/>
+	</div>
+
+	<div class="mb-6">
+		<PasswordInput
+			id="confirm_password"
 			label="Confirm Password"
 			name="confirm_password"
-			errorMessage={formErrors?.confirm_password}
+			passwordError={formErrors?.confirm_password}
 		/>
+	</div>
 
-		<button class="btn btn-primary" type="submit">Submit</button>
-		<p>Already have an account? <a class="text-primary" href="/auth/signin">Sign in</a></p>
-	</form>
-</div>
+	<Button class="mb-6 w-full" type="submit">Submit</Button>
+
+	<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+		Have an account? <a
+			href="/auth/signin"
+			class="text-primary-700 dark:text-primary-500 hover:underline"
+		>
+			Sign in
+		</a>
+	</div>
+</form>
