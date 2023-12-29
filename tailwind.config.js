@@ -7,6 +7,9 @@ export default {
 	darkMode: 'class',
 	plugins: [require('flowbite/plugin')],
 	theme: {
+		maxWidth: {
+			lg: '1440px'
+		},
 		extend: {
 			colors: {
 				primary: {
