@@ -4,6 +4,7 @@ import { AuthApiError } from '@supabase/supabase-js';
 import { fail } from '@sveltejs/kit';
 import { ZodError } from 'zod';
 
+// Interfaces
 import type { Actions } from './$types';
 
 export const actions: Actions = {
@@ -26,7 +27,7 @@ export const actions: Actions = {
 			email,
 			password,
 			options: {
-				emailRedirectTo: `${url.origin}/auth/callback?next=/auth/create-profile`
+				emailRedirectTo: `${url.origin}/auth/confirm?next=/auth/create-profile`
 			}
 		});
 

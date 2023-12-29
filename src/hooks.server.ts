@@ -2,6 +2,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 
+// Interfaces
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
