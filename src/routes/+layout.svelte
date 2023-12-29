@@ -1,13 +1,12 @@
-<script>
+<script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
-
+	// Styling
 	import '../app.postcss';
 
-	export let data;
+	const { data } = $props();
 
 	let { supabase, session } = data;
-	$: ({ supabase, session } = data);
 
 	onMount(() => {
 		const {
@@ -22,6 +21,4 @@
 	});
 </script>
 
-<main class="flex h-full min-h-screen max-w-screen-lg flex-col p-8">
-	<slot />
-</main>
+<slot />
