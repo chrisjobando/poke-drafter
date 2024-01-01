@@ -1,17 +1,20 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	// Components
+	import { Input, Listgroup } from 'flowbite-svelte';
 	// Data
 	import pokemonNames from '$lib/names.json';
 
-	interface IDebouncedSearchBarProps {
-		filteredNames: string[];
-		name: string;
-		placeholder: string;
-		searchQuery: string;
-		formRef?: HTMLFormElement;
+	interface IPokemonSearchProps {
+		pokemonSelection: {
+			selectedPokemon: string;
+		};
 	}
 
-	let { filteredNames, name, placeholder, searchQuery, formRef } =
-		$props<IDebouncedSearchBarProps>();
+	let { pokemonSelection } = $props<IPokemonSearchProps>();
+
+	let filteredNames = $state<string[]>([]);
+	let formRef = $state<HTMLFormElement | null>(null);
 
 	// Methods
 	function onSelectAutoComplete(pokemonName: string) {
@@ -19,7 +22,7 @@
 		filteredNames = [];
 
 		// Set Selected
-		searchQuery = pokemonName;
+		pokemonSelection.selectedPokemon = pokemonName;
 
 		// Get Pokemon Data
 		if (formRef) {
@@ -30,7 +33,7 @@
 	function onSearchInputKeyup(event: Event) {
 		const inputEl = event.target as HTMLInputElement;
 		const inputVal = inputEl.value;
-		searchQuery = inputVal;
+		pokemonSelection.selectedPokemon = inputVal;
 		filteredNames = filterNamesFromSearchQuery(inputVal);
 	}
 
@@ -55,23 +58,35 @@
 	}
 </script>
 
-<div>
-	<input
+<form
+	action="?/previewPokemon"
+	method="post"
+	bind:this={formRef}
+	use:enhance={({ formData }) => {
+		formData.set('pokemon_name', pokemonSelection.selectedPokemon);
+
+		return async ({ update }) => {
+			// Prevent clearing form inputs on submit
+			await update({ reset: false });
+		};
+	}}
+>
+	<Input
 		autocomplete="off"
+		class="w-full"
+		id="pokemon_search"
+		name="pokemon_search"
+		placeholder="Search for Pokemon"
 		type="text"
-		value={searchQuery}
-		{name}
-		{placeholder}
+		value={pokemonSelection.selectedPokemon}
 		on:keyup={onDebounceSearch}
 	/>
 
 	{#if filteredNames.length}
-		<ul>
-			{#each filteredNames as name}
-				<li>
-					<button on:click={() => onSelectAutoComplete(name)}>{name}</button>
-				</li>
-			{/each}
-		</ul>
+		<Listgroup active items={filteredNames} let:item class="mt-1 w-48">
+			<button class="h-full w-full text-left" on:click={() => onSelectAutoComplete(item)}>
+				{item}
+			</button>
+		</Listgroup>
 	{/if}
-</div>
+</form>
