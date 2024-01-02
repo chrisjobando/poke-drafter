@@ -1,22 +1,50 @@
 <script lang="ts">
-	// Forms
 	// Components
 	import { DraftDisplay, PokedexDisplay, TeamDisplay } from '$lib/components/draft';
 	import { Button } from 'flowbite-svelte';
+	// Stores
+	import { createPokemonSelection } from '$lib/components/store/pokemonSelectionStore.svelte';
 	// Interfaces
+	import type { IDraft, IOtherTrainer, IPokemon } from '$lib/db/schema/DatabaseTypes';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form } = $props<{ data: PageData; form: ActionData }>();
 
-	const { supabase } = data;
+	let {
+		supabase,
+		trainerData,
+		draftData: initialDraftData,
+		otherTrainerData: initialOtherTrainerData,
+		teamId,
+		trainerPokemonData: initialTrainerPokemonData
+	} = data;
 
 	// State
+	let draftData = $state<IDraft | undefined>(initialDraftData);
 
-	// Form Ref
+	let trainerPokemonData = $state<IPokemon[]>(initialTrainerPokemonData ?? []);
+	let otherTrainerData = $state<IOtherTrainer[]>(initialOtherTrainerData ?? []);
+
+	let userActive = $state<boolean>(false);
+
+	const pokemonSelection = createPokemonSelection();
+
+	// Active user check
+	$effect(() => {
+		if (draftData) {
+			userActive = draftData.active_trainer === trainerData.id;
+		}
+	});
 
 	// Search Results
 	$effect(() => {
-		//
+		if (form) {
+			if (form.success) {
+				if ('selectedPokemon' in form) {
+					pokemonSelection.selectedPokemon = form.selectedPokemon as IPokemon;
+				}
+			}
+		}
 	});
 
 	// Subscriptions
@@ -26,9 +54,30 @@
 		'postgres_changes',
 		{ event: 'UPDATE', schema: 'public', table: 'drafts' },
 		async (payload) => {
-			const updatedDraftData = payload.new;
+			draftData = payload.new as IDraft;
+		}
+	);
 
-			console.log('cobando ~ file: +page.svelte:29 ~ updatedDraftData:', updatedDraftData);
+	draftChannel.on(
+		'postgres_changes',
+		{ event: 'INSERT', schema: 'public', table: 'pokemon' },
+		async (payload) => {
+			const newPokemon = payload.new as IPokemon;
+
+			if (newPokemon.team_id === teamId) {
+				// Update own team
+				trainerPokemonData.push(newPokemon);
+			} else if (otherTrainerData) {
+				// Find and update other team
+				for (let i = 0; i < otherTrainerData.length; i++) {
+					const trainer = otherTrainerData[i];
+
+					if (trainer.trainerTeamId === newPokemon.team_id) {
+						trainer.teamPokemonData.push(newPokemon);
+						break;
+					}
+				}
+			}
 		}
 	);
 
@@ -40,15 +89,19 @@
 </svelte:head>
 
 <div class="grid min-h-screen grid-cols-12 gap-5">
-	<DraftDisplay />
+	{#if draftData}
+		<DraftDisplay {draftData} {otherTrainerData} />
+		<TeamDisplay {trainerPokemonData} />
+		<PokedexDisplay {pokemonSelection} {userActive} />
+	{:else}
+		<div />
+		<div />
+		<div />
+	{/if}
 
-	<TeamDisplay />
+	<div />
 
-	<PokedexDisplay />
-
-	<div class="bg-primary-500 h-32 w-full"></div>
-
-	<form method="POST" action="/auth/signout">
-		<Button type="submit">Sign out</Button>
+	<form action="/auth/signout" class="self-end" method="POST">
+		<Button class="w-full rounded-none rounded-tl-lg" type="submit">Sign out</Button>
 	</form>
 </div>
