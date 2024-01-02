@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	// Components
-	import { Input, Listgroup } from 'flowbite-svelte';
+	import { Listgroup, Search } from 'flowbite-svelte';
+	// Interfaces
+	import type { IPokemonSelection } from '../store/pokemonSelectionStore.svelte';
 	// Data
 	import pokemonNames from '$lib/names.json';
 
 	interface IPokemonSearchProps {
-		pokemonSelection: {
-			selectedPokemon: string;
-		};
+		pokemonSelection: Pick<IPokemonSelection, 'pokemonName'>;
 	}
 
 	let { pokemonSelection } = $props<IPokemonSearchProps>();
@@ -22,7 +22,7 @@
 		filteredNames = [];
 
 		// Set Selected
-		pokemonSelection.selectedPokemon = pokemonName;
+		pokemonSelection.pokemonName = pokemonName;
 
 		// Get Pokemon Data
 		if (formRef) {
@@ -33,7 +33,7 @@
 	function onSearchInputKeyup(event: Event) {
 		const inputEl = event.target as HTMLInputElement;
 		const inputVal = inputEl.value;
-		pokemonSelection.selectedPokemon = inputVal;
+		pokemonSelection.pokemonName = inputVal;
 		filteredNames = filterNamesFromSearchQuery(inputVal);
 	}
 
@@ -60,10 +60,10 @@
 
 <form
 	action="?/previewPokemon"
-	method="post"
+	method="POST"
 	bind:this={formRef}
 	use:enhance={({ formData }) => {
-		formData.set('pokemon_name', pokemonSelection.selectedPokemon);
+		formData.set('pokemon_name', pokemonSelection.pokemonName);
 
 		return async ({ update }) => {
 			// Prevent clearing form inputs on submit
@@ -71,19 +71,19 @@
 		};
 	}}
 >
-	<Input
+	<Search
 		autocomplete="off"
 		class="w-full"
 		id="pokemon_search"
 		name="pokemon_search"
 		placeholder="Search for Pokemon"
 		type="text"
-		value={pokemonSelection.selectedPokemon}
+		value={pokemonSelection.pokemonName}
 		on:keyup={onDebounceSearch}
 	/>
 
 	{#if filteredNames.length}
-		<Listgroup active items={filteredNames} let:item class="mt-1 w-48">
+		<Listgroup active class="absolute z-10 mt-1 w-48" items={filteredNames} let:item>
 			<button class="h-full w-full text-left" on:click={() => onSelectAutoComplete(item)}>
 				{item}
 			</button>
