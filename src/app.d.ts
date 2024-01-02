@@ -1,4 +1,10 @@
-import type { IDraft, ITeam, ITrainer } from '$lib/db/schema/DatabaseTypes';
+import type {
+	IDraft,
+	IOtherTrainer,
+	IPokemon,
+	ITeam,
+	ITrainer
+} from '$lib/db/schema/DatabaseTypes';
 import type { Database } from '$lib/db/types';
 import type { Session, SupabaseClient } from '@supabase/supabase-js';
 
@@ -9,7 +15,9 @@ declare global {
 			getSession: () => Promise<Session | null>;
 			getTrainer: () => Promise<ITrainer | null>;
 			getDraft: () => Promise<IDraft | null>;
-			getTeam: () => Promise<ITeam | null>;
+			getTeam: (activeGym: string, trainerId: string) => Promise<ITeam | null>;
+			getTeamPokemon: (teamId: string) => Promise<IPokemon[] | null>;
+			getOtherTrainers: (activeGymId: string, trainerId: string) => Promise<IOtherTrainer[] | null>;
 		}
 		interface PageData {
 			session: Session | null;
