@@ -8,6 +8,12 @@ export type IGym = Database['public']['Tables']['gyms']['Row'];
 
 export type IDraft = Database['public']['Tables']['drafts']['Row'];
 
+export interface IOtherTrainer {
+	teamPokemonData: IPokemon[];
+	trainerData: ITrainer;
+	trainerTeamId?: string;
+}
+
 // Insert Row
 export type INewTrainer = Database['public']['Tables']['trainers']['Insert'];
 export type INewPokemon = Database['public']['Tables']['pokemon']['Insert'];
