@@ -2,29 +2,16 @@
 	import cx from 'classnames';
 	import { PokemonPreview } from '../pokemon';
 	// Interfaces
-	import type { ITrainer } from '$lib/db/schema/DatabaseTypes';
+	import type { IOtherTrainer } from '$lib/db/schema/DatabaseTypes';
 
 	interface OtherTrainerDisplayProps {
-		trainerData: ITrainer;
+		trainerData: IOtherTrainer;
 		active?: boolean;
 	}
 
-	const { active, trainerData } = $props<OtherTrainerDisplayProps>();
+	const { active, trainerData: trainerDataProp } = $props<OtherTrainerDisplayProps>();
 
-	const mockPokemon = {
-		name: 'Pikachu',
-		avatar_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'
-	};
-
-	const mockPokemon2 = {
-		name: 'Charmander',
-		avatar_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png'
-	};
-
-	const mockPokemon3 = {
-		name: 'Squirtle',
-		avatar_url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png'
-	};
+	const { trainerData, teamPokemonData = [] } = trainerDataProp;
 </script>
 
 <div class={cx('box-border h-auto min-h-[80px] w-full px-4 py-2', { 'bg-primary-600': active })}>
@@ -33,11 +20,11 @@
 	</p>
 
 	<div class="flex h-8 flex-wrap gap-1">
-		<PokemonPreview pokemon={mockPokemon} />
-		<PokemonPreview pokemon={mockPokemon2} />
-		<PokemonPreview pokemon={mockPokemon3} />
-		<PokemonPreview />
-		<PokemonPreview />
-		<PokemonPreview />
+		<PokemonPreview pokemon={teamPokemonData[0]} />
+		<PokemonPreview pokemon={teamPokemonData[1]} />
+		<PokemonPreview pokemon={teamPokemonData[2]} />
+		<PokemonPreview pokemon={teamPokemonData[3]} />
+		<PokemonPreview pokemon={teamPokemonData[4]} />
+		<PokemonPreview pokemon={teamPokemonData[5]} />
 	</div>
 </div>
