@@ -1,50 +1,26 @@
 <script lang="ts">
-	import type { ITrainer } from '$lib/db/schema/DatabaseTypes';
-	import { Heading } from 'flowbite-svelte';
+	import { Heading, P } from 'flowbite-svelte';
 	import { OtherTrainerDisplay } from '../trainers';
+	// Interfaces
+	import type { IDraft, IOtherTrainer } from '$lib/db/schema/DatabaseTypes';
 
-	const mockTrainerData: ITrainer = {
-		auth_id: '1234',
-		display_name: 'John Doe',
-		id: '1',
-		role: 'trainer'
-	};
+	interface IDraftDisplayProps {
+		draftData: Pick<IDraft, 'round_number'>;
+		otherTrainerData?: IOtherTrainer[];
+	}
 
-	const mockTrainerData2: ITrainer = {
-		auth_id: '5678',
-		display_name: 'Jane Doe',
-		id: '2',
-		role: 'trainer'
-	};
-
-	const mockTrainerData3: ITrainer = {
-		auth_id: '91011',
-		display_name: 'John Smith',
-		id: '3',
-		role: 'trainer'
-	};
-
-	const mockTrainerData4: ITrainer = {
-		auth_id: '121314',
-		display_name: 'Jane Smith',
-		id: '4',
-		role: 'trainer'
-	};
-
-	const mockTrainerData5: ITrainer = {
-		auth_id: '151617',
-		display_name: 'Taco Bell',
-		id: '5',
-		role: 'trainer'
-	};
+	// Props
+	const { draftData, otherTrainerData } = $props<IDraftDisplayProps>();
 </script>
 
 <div class="col-span-2 h-full border-r border-black py-8">
-	<Heading class="mb-8 ml-4" tag="h3">Round 1</Heading>
+	<Heading class="mb-8 ml-4" tag="h3">Round {draftData.round_number}</Heading>
 
-	<OtherTrainerDisplay trainerData={mockTrainerData} />
-	<OtherTrainerDisplay trainerData={mockTrainerData2} />
-	<OtherTrainerDisplay trainerData={mockTrainerData3} />
-	<OtherTrainerDisplay trainerData={mockTrainerData4} />
-	<OtherTrainerDisplay trainerData={mockTrainerData5} />
+	{#if otherTrainerData && otherTrainerData.length}
+		{#each otherTrainerData as trainerData}
+			<OtherTrainerDisplay {trainerData} />
+		{/each}
+	{:else}
+		<P class="text-bold ml-4">No other trainers</P>
+	{/if}
 </div>
