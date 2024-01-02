@@ -5,7 +5,7 @@
 
 	interface IPokemonPreviewProps {
 		pokemon?: Pick<IPokemon, 'avatar_url' | 'name'>;
-		size?: 'sm' | 'lg';
+		size?: 'sm' | 'lg' | 'xl';
 	}
 
 	const { size = 'sm', pokemon } = $props<IPokemonPreviewProps>();
